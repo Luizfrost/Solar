@@ -4,11 +4,16 @@ import path from "path";
 import { WebSocketServer, WebSocket } from "ws";
 import { createServer } from "http";
 import fs from "fs";
+import { fileURLToPath } from 'url';
+
+// Configurar __dirname para ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configurar banco de dados para produção
 const dbPath = process.env.NODE_ENV === 'production' 
   ? '/var/data/church.db'
-  : 'church.db';
+  : path.join(__dirname, 'church.db');
 
 // Criar diretório se não existir
 const dbDir = path.dirname(dbPath);
@@ -452,15 +457,29 @@ async function startServer() {
     }
   });
 
-  // Servir arquivos estáticos
-  app.use(express.static(path.join(__dirname, "dist")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "dist", "index.html"));
-  });
+   // Servir arquivos estáticos - CORRIGIDO
+  const distPath = path.join(__dirname, "dist");
+  console.log(`📁 Servindo arquivos estáticos de: ${distPath}`);
+  
+  // Verificar se a pasta dist existe
+  if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  } else {
+    console.warn("⚠️ Pasta dist não encontrada. Execute 'npm run build' primeiro.");
+  }
 
-  server.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
+  // CORREÇÃO: Especificar tipos para o listen
+  const HOST: string = "0.0.0.0";
+  const PORT_NUMBER: number = Number(PORT);
+  
+  server.listen(PORT_NUMBER, HOST, () => {
+    console.log(`✅ Servidor rodando em http://${HOST}:${PORT_NUMBER}`);
+    console.log(`🌐 Acesse localmente: http://localhost:${PORT_NUMBER}`);
+    console.log(`🔑 Login: admin / admin123`);
   });
 }
 
-startServer();
+startServer().catch(console.error);
