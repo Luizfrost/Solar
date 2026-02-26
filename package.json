@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
+    "start": "node dist/server-prod.js",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
+    "@types/react": "^19.2.14",
     "@types/ws": "^8.18.1",
     "autoprefixer": "^10.4.21",
     "tailwindcss": "^4.1.14",
